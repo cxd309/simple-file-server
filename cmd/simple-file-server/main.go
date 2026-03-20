@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -15,7 +17,17 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+//go:embed VERSION
+var versionFile string
+
+var version = strings.TrimSpace(versionFile)
+
 func main() {
+	if os.Args[1] == "--version" {
+		fmt.Println(version)
+		return
+	}
+
 	if len(os.Args) < 3 || len(os.Args) > 4 {
 		log.Fatalf("Usage: %s <directory> <port> [repo_name]\n", os.Args[0])
 	}

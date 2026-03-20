@@ -10,8 +10,7 @@ TARGETS := \
 	darwin/arm64 \
 	windows/amd64
 
-.PHONY: build clean
-
+.PHONY: build
 build:
 	@mkdir -p $(OUTDIR)
 	@$(foreach target,$(TARGETS), \
@@ -22,5 +21,13 @@ build:
 		GOOS=$(OS) GOARCH=$(ARCH) go build $(LDFLAGS) -o $(OUTDIR)/$(BINARY)-$(OS)-$(ARCH)$(EXT) . ; \
 	)
 
+.PHONY: clean
 clean:
 	rm -rf $(OUTDIR)
+
+.PHONY: fmt
+fmt:
+	go mod tidy
+	gofmt -w .
+	golangci-lint run
+	dprint fmt

@@ -17,7 +17,7 @@ build:
 		$(eval ARCH := $(word 2,$(subst /, ,$(target)))) \
 		$(eval EXT  := $(if $(filter windows,$(OS)),.exe,)) \
 		echo "Building $(OS)/$(ARCH)..."; \
-		GOOS=$(OS) GOARCH=$(ARCH) go build $(LDFLAGS) -o $(OUTDIR)/$(BINARY)-$(OS)-$(ARCH)$(EXT) ./cmd/$(BINARY) ; \
+		GOOS=$(OS) GOARCH=$(ARCH) go build $(LDFLAGS) -o $(OUTDIR)/$(BINARY)-$(OS)-$(ARCH)$(EXT) . ; \
 	)
 
 .PHONY: clean

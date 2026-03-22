@@ -1,4 +1,4 @@
-module simple-file-server
+module github.com/cxd309/simple-file-server
 
 go 1.26.1
 

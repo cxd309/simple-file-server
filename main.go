@@ -23,22 +23,26 @@ var versionFile string
 var version = strings.TrimSpace(versionFile)
 
 func main() {
-	if os.Args[1] == "--version" {
+	if len(os.Args) > 1 && os.Args[1] == "--version" {
 		fmt.Println(version)
 		return
 	}
 
 	if len(os.Args) < 3 || len(os.Args) > 4 {
-		log.Fatalf("Usage: %s <directory> <port> [repo_name]\n", os.Args[0])
+		log.Fatalf("Usage: %s <directory> <port> [path_prefix]\n", os.Args[0])
 	}
 
 	dir := os.Args[1]
 	port := os.Args[2]
-	var repoName string
+	var pathPrefix string
 	if len(os.Args) == 4 {
-		repoName = os.Args[3]
+		pathPrefix = os.Args[3]
 	}
 
+	serve(dir, port, pathPrefix)
+}
+
+func serve(dir, port, pathPrefix string) {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		log.Fatalf("Directory does not exist: %s\n", dir)
 	}
@@ -48,8 +52,8 @@ func main() {
 	r.Use(middleware.Recoverer)
 
 	fs := http.FileServer(http.Dir(dir))
-	if repoName != "" {
-		prefix := "/" + repoName
+	if pathPrefix != "" {
+		prefix := "/" + pathPrefix
 		r.Handle(prefix, http.RedirectHandler(prefix+"/", http.StatusMovedPermanently))
 		r.Handle(prefix+"/*", http.StripPrefix(prefix, fs))
 	} else {
@@ -68,8 +72,8 @@ func main() {
 
 	go func() {
 		base := fmt.Sprintf("http://localhost:%s", port)
-		if repoName != "" {
-			base += "/" + repoName + "/"
+		if pathPrefix != "" {
+			base += "/" + pathPrefix + "/"
 		}
 		log.Printf("Serving %s on %s\n", dir, base)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
